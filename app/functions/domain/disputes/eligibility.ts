@@ -1,5 +1,6 @@
 import type { ChannelRecord } from '../knowledge/types.ts';
 import type { DisputeInput, ChannelEligibility } from '../../shared/dispute.ts';
+import { getEvidenceItem } from './evidence.ts';
 
 export type ChannelEvaluation = {
   channel: ChannelRecord;
@@ -20,6 +21,17 @@ const KIND_ORDER_GROUP: Record<ChannelRecord['kind'], number> = {
 };
 
 const DEPRIORITIZED_NEGOTIATION_GROUP = 95;
+
+const COUNTERPARTY_TEXT: Record<DisputeInput['counterpartyType'], string> = {
+  individual_landlord: '个人房东',
+  agency: '中介/代理机构',
+  operator: '运营方/平台',
+  unknown: '身份未知',
+};
+
+function evidenceTitles(ids: string[]): string {
+  return ids.map((id) => getEvidenceItem(id)?.title ?? id).join('、');
+}
 
 function evidenceStatus(input: DisputeInput, evidenceId: string): string {
   return input.evidence.find((e) => e.evidenceId === evidenceId)?.status ?? 'unknown';
@@ -53,7 +65,7 @@ export function evaluateChannel(channel: ChannelRecord, input: DisputeInput): Ch
     return {
       channel,
       eligibility: 'ineligible',
-      reason: `该渠道受理对象不包含「${input.counterpartyType}」类对方。`,
+      reason: `该渠道受理对象不包含「${COUNTERPARTY_TEXT[input.counterpartyType]}」类对方。`,
       orderGroup,
     };
   }
@@ -89,7 +101,7 @@ export function evaluateChannel(channel: ChannelRecord, input: DisputeInput): Ch
     return {
       channel,
       eligibility: 'needs_check',
-      reason: `需补充材料：${missingRequired.join('、')}。`,
+      reason: `需补充材料：${evidenceTitles(missingRequired)}。`,
       orderGroup,
     };
   }
@@ -97,7 +109,7 @@ export function evaluateChannel(channel: ChannelRecord, input: DisputeInput): Ch
     return {
       channel,
       eligibility: 'needs_check',
-      reason: `以下材料状态待核实：${unknownRequired.join('、')}。`,
+      reason: `以下材料状态待核实：${evidenceTitles(unknownRequired)}。`,
       orderGroup,
     };
   }

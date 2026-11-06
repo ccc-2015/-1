@@ -117,6 +117,7 @@ export type PathStep = {
 
 export type ExcludedOption = {
   channelId: string;
+  channelName: string;
   reason: string;
 };
 
@@ -277,7 +278,7 @@ export function isDisputePlan(value: unknown): value is DisputePlan {
   if (!v.excludedOptions.every((x) => {
     if (!x || typeof x !== 'object') return false;
     const xo = x as Record<string, unknown>;
-    return typeof xo.channelId === 'string' && typeof xo.reason === 'string';
+    return typeof xo.channelId === 'string' && typeof xo.channelName === 'string' && typeof xo.reason === 'string';
   })) return false;
   if (!Array.isArray(v.references)) return false;
   return true;

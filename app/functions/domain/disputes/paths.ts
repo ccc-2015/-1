@@ -110,6 +110,7 @@ export function buildPathSteps(
 
   const excludedOptions: ExcludedOption[] = ineligible.map((evalItem) => ({
     channelId: evalItem.channel.id,
+    channelName: evalItem.channel.name,
     reason: evalItem.reason,
   }));
 

@@ -2,7 +2,9 @@ import {
   isFailureEnvelope,
   isSuccessEnvelope,
   type ActionKind,
+  type ApiMeta,
   type Envelope,
+  type Success,
 } from '@shared/envelope.ts';
 import { isPublicConfig, type PublicConfig } from '@shared/config.ts';
 import { isSourceRecordPublic, type SourceRecordPublic } from '@shared/sources.ts';
@@ -17,6 +19,10 @@ export type ApiError = {
   retryable: boolean;
   requestId?: string;
 };
+
+// 业务结果连同响应 meta 一起返回，前端据 coverage/processingMode/warnings
+// 区分 success 与 partial（limited/unsupported 能力降级），不显示成「已全面审查」。
+export type ApiResult<T> = { data: T; meta: ApiMeta };
 
 const BASE = '/functions/v1/app';
 
@@ -65,7 +71,7 @@ async function call<T>(
   init: RequestInit | undefined,
   dataGuard: (data: unknown) => data is T,
   signal?: AbortSignal,
-): Promise<T> {
+): Promise<ApiResult<T>> {
   const url = `${BASE}?action=${encodeURIComponent(action)}`;
   let raw: Response;
   try {
@@ -124,13 +130,13 @@ async function call<T>(
       retryable: false,
     } satisfies ApiError;
   }
-  return envelope.data;
+  return { data: envelope.data, meta: envelope.meta };
 }
 
 export type ConfigResult = { config: PublicConfig };
 
 export function fetchConfig(signal?: AbortSignal): Promise<PublicConfig> {
-  return call('config', { method: 'GET' }, isPublicConfig, signal);
+  return call('config', { method: 'GET' }, isPublicConfig, signal).then((r) => r.data);
 }
 
 export type SourcesResult = { sources: SourceRecordPublic[] };
@@ -173,7 +179,7 @@ export function fetchSources(
 export function analyzeContract(
   input: AnalyzeContractInput,
   signal?: AbortSignal,
-): Promise<ContractAnalysis> {
+): Promise<ApiResult<ContractAnalysis>> {
   return call(
     'analyze-contract',
     {
@@ -189,7 +195,7 @@ export function analyzeContract(
 export function diagnoseDispute(
   input: DisputeInput,
   signal?: AbortSignal,
-): Promise<DisputePlan> {
+): Promise<ApiResult<DisputePlan>> {
   if (!isDisputeInput(input)) {
     return Promise.reject({
       kind: 'invalid_response',
