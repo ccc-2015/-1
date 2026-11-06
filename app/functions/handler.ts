@@ -1,7 +1,10 @@
 import { buildPublicConfig } from './domain/config.ts';
 import { loadKnowledgeSnapshot } from './data/knowledge-snapshot.ts';
 import { diagnoseDispute } from './domain/disputes/index.ts';
+import { analyzeContract, checkContractInput } from './domain/contracts/index.ts';
+import { selectProvider } from './integrations/index.ts';
 import { isDisputeInput } from './shared/dispute.ts';
+import { isAnalyzeContractInput } from './shared/contract.ts';
 import {
   ERROR_CODES,
   ERROR_HTTP_STATUS,
@@ -143,10 +146,29 @@ export async function handler(request: Request): Promise<Response> {
       });
     }
 
+    if (actionParam === 'analyze-contract') {
+      if (!isAnalyzeContractInput(parsed)) {
+        return failure(requestId, 'invalid_input', '合同检查请求字段未通过校验。');
+      }
+      const inputError = checkContractInput(parsed);
+      if (inputError) {
+        return failure(requestId, inputError.code, inputError.message);
+      }
+      const bundle = loadKnowledgeSnapshot();
+      const provider = selectProvider();
+      const result = await analyzeContract(parsed, bundle, provider);
+      return success(requestId, result.analysis, {
+        knowledgeVersion: result.knowledgeVersion,
+        processingMode: result.processingMode,
+        coverage: result.coverage,
+        warnings: result.warnings,
+      });
+    }
+
     return failure(
       requestId,
       'service_not_configured',
-      `Action ${actionParam} is not yet implemented (P1-07 pending).`,
+      `Action ${actionParam} is not yet implemented.`,
     );
   }
 

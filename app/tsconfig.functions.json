@@ -6,5 +6,5 @@
     "allowImportingTsExtensions": true
   },
   "include": ["functions/**/*.ts"],
-  "exclude": ["node_modules", "dist", "functions/index.ts"]
+  "exclude": ["node_modules", "dist"]
 }
