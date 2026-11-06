@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Qoder Sites local cache
+.qoder-sites/
+.qoder-sites.json
+
+# Local design edit record (not a publication asset)
+.qoder/design/local-edits.json
+
+# Logs
+*.log
+npm-debug.log*
