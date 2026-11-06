@@ -1,0 +1,26 @@
+[
+  {
+    "ruleId": "rule-deposit-agreement-required",
+    "scenario": "deposit_deducted",
+    "description": "押金扣减应有合同或法律依据：合同未约定的扣减情形之外，出租人无正当理由不得扣减押金。",
+    "orderGroup": 10,
+    "sourceRefs": [{ "sourceId": "src-housing-rental-regulation", "articleIds": ["art-hrr-10"] }]
+  },
+  {
+    "ruleId": "rule-deposit-return-negotiation-first",
+    "scenario": "deposit_not_returned",
+    "description": "押金未退还时优先与出租方核实约定与退还安排，保留支付与交接凭证，再考虑后续渠道。",
+    "orderGroup": 10,
+    "sourceRefs": [{ "sourceId": "src-housing-rental-regulation", "articleIds": ["art-hrr-10"] }]
+  },
+  {
+    "ruleId": "rule-zhengzhou-enterprise-fund-supervision",
+    "scenario": "deposit_deducted",
+    "description": "郑州从事转租经营的住房租赁企业须设立资金监管专用账户，租金押金通过该账户收付；涉及企业时可据此核实资金流向。",
+    "orderGroup": 40,
+    "sourceRefs": [
+      { "sourceId": "src-zhengzhou-rental-ordinance", "articleIds": ["art-zzo-24"] },
+      { "sourceId": "src-zhengzhengban-2025-13", "articleIds": ["art-zzb13-deposit"] }
+    ]
+  }
+]
