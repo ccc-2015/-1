@@ -16,6 +16,19 @@ export const PHASE1_SCENARIOS: readonly ScenarioId[] = [
   'deposit_deducted',
 ] as const;
 
+export const ALL_SCENARIOS: readonly ScenarioId[] = [
+  'deposit_not_returned',
+  'deposit_deducted',
+  'early_termination',
+  'repair_dispute',
+  'extra_fee',
+  'agency_service',
+] as const;
+
+export function isScenarioId(value: string): value is ScenarioId {
+  return (ALL_SCENARIOS as readonly string[]).includes(value);
+}
+
 export type FeatureFlags = {
   contractAnalysis: boolean;
   disputePlan: boolean;

@@ -1,4 +1,5 @@
 import type { ChannelRecord, KnowledgeBundle, SourceRecord } from './types.ts';
+import { isScenarioId, type ScenarioId } from '../../shared/config.ts';
 
 export type SelectionContext = {
   cityCode: string;
@@ -91,4 +92,33 @@ export function buildAllowedRefSet(selections: SourceSelection[]): Set<string> {
     }
   }
   return set;
+}
+
+// Scenarios that are actually backed by verified+current data for a supported city:
+// a verified channel accepting the scenario AND a verified source covering it.
+// Nothing verified => empty, so the UI never claims a scenario it cannot substantiate.
+export function deriveSupportedScenarios(bundle: KnowledgeBundle, asOf = new Date()): ScenarioId[] {
+  const result = new Set<ScenarioId>();
+  for (const { cityCode } of bundle.supportedCities) {
+    const channelScenarios = new Set<string>();
+    for (const ch of bundle.channels) {
+      if (!isReviewCurrent(ch, asOf) || ch.cityCode !== cityCode) continue;
+      for (const s of ch.acceptedScenarios) channelScenarios.add(s);
+    }
+    const sourceScenarios = new Set<string>();
+    for (const src of bundle.sources) {
+      if (!isReviewCurrent(src, asOf) || !matchesJurisdiction(src, cityCode)) continue;
+      for (const s of src.scenarios) sourceScenarios.add(s);
+    }
+    for (const s of channelScenarios) {
+      if (sourceScenarios.has(s) && isScenarioId(s)) result.add(s);
+    }
+  }
+  return [...result];
+}
+
+// Verified+current sources only. Unverified (draft/needs_review) records are never
+// exposed as authoritative citations (doc 01 §2.2).
+export function listVerifiedSources(bundle: KnowledgeBundle, asOf = new Date()): SourceRecord[] {
+  return bundle.sources.filter((s) => isReviewCurrent(s, asOf));
 }

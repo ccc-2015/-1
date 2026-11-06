@@ -4,7 +4,7 @@ import type { KnowledgeBundle } from '../domain/knowledge/types.ts';
 
 const SNAPSHOT_JSON = `{
   "version": "kb-zhengzhou-2026.11.06-draft",
-  "builtAt": "2026-11-06T16:44:33.115Z",
+  "builtAt": "2026-11-06T17:07:53.391Z",
   "synthetic": false,
   "supportedCities": [],
   "sources": [

@@ -1,5 +1,7 @@
 import { buildPublicConfig } from './domain/config.ts';
 import { loadKnowledgeSnapshot } from './data/knowledge-snapshot.ts';
+import { listVerifiedSources } from './domain/knowledge/select.ts';
+import { toPublicSource } from './domain/knowledge/types.ts';
 import { diagnoseDispute } from './domain/disputes/index.ts';
 import { analyzeContract, checkContractInput } from './domain/contracts/index.ts';
 import { selectProvider } from './integrations/index.ts';
@@ -90,10 +92,18 @@ export async function handler(request: Request): Promise<Response> {
         headers: { ...NO_STORE, Allow: 'GET' },
       });
     }
+    const bundle = loadKnowledgeSnapshot();
     if (actionParam === 'config') {
-      return success(requestId, buildPublicConfig());
+      const provider = selectProvider();
+      return success(requestId, buildPublicConfig(bundle, provider.available), {
+        knowledgeVersion: bundle.version,
+      });
     }
-    return success(requestId, { sources: [] });
+    return success(
+      requestId,
+      { sources: listVerifiedSources(bundle).map(toPublicSource) },
+      { knowledgeVersion: bundle.version },
+    );
   }
 
   if (
