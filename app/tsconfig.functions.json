@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": [],
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["functions/**/*.ts"],
+  "exclude": ["node_modules", "dist", "functions/index.ts"]
+}

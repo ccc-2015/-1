@@ -1,4 +1,7 @@
 import { buildPublicConfig } from './domain/config.ts';
+import { loadKnowledgeSnapshot } from './data/knowledge-snapshot.ts';
+import { diagnoseDispute } from './domain/disputes/index.ts';
+import { isDisputeInput } from './shared/dispute.ts';
 import {
   ERROR_CODES,
   ERROR_HTTP_STATUS,
@@ -125,10 +128,25 @@ export async function handler(request: Request): Promise<Response> {
         'Content-Type must be application/json.',
       );
     }
+
+    if (actionParam === 'diagnose-dispute') {
+      if (!isDisputeInput(parsed)) {
+        return failure(requestId, 'invalid_input', '纠纷请求字段未通过校验。');
+      }
+      const bundle = loadKnowledgeSnapshot();
+      const result = diagnoseDispute(parsed, bundle);
+      return success(requestId, result.plan, {
+        knowledgeVersion: result.knowledgeVersion,
+        processingMode: result.processingMode,
+        coverage: result.coverage,
+        warnings: result.warnings,
+      });
+    }
+
     return failure(
       requestId,
       'service_not_configured',
-      `Action ${actionParam} is not yet implemented (P1-06/P1-07 pending).`,
+      `Action ${actionParam} is not yet implemented (P1-07 pending).`,
     );
   }
 
