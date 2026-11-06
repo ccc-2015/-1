@@ -271,7 +271,8 @@ for (const code of verifiedChannelCityCodes) {
 const version = `kb-zhengzhou-${asOf.replace(/-/g, '.')}${supportedCities.length === 0 ? '-draft' : ''}`;
 const bundle = {
   version,
-  builtAt: new Date().toISOString(),
+  // Day-granular so same-day rebuilds don't churn the committed snapshot.
+  builtAt: `${asOf}T00:00:00.000Z`,
   synthetic: false,
   supportedCities,
   sources,
