@@ -45,6 +45,13 @@ function diag(payload: Record<string, unknown>): void {
   }
 }
 
+// LLM_BASE_URL 按 OpenAI 兼容约定填 base（如 https://host/v1），由这里自动拼出 /chat/completions；已带该路径的也兼容。
+function resolveChatCompletionsUrl(baseUrl: string): string {
+  const trimmed = baseUrl.replace(/\/+$/, '');
+  if (/\/chat\/completions$/.test(trimmed)) return trimmed;
+  return `${trimmed}/chat/completions`;
+}
+
 function buildUserPrompt(req: ExtractRequest): string {
   const scope = req.textScope === 'full_contract' ? '完整合同' : '合同片段';
   const candidates =
@@ -140,12 +147,13 @@ export class OpenAICompatProvider implements LLMProvider {
       };
     }
 
-    diag({ ev: 'attempt', baseUrl: this.baseUrl, model: this.model });
+    const endpoint = resolveChatCompletionsUrl(this.baseUrl as string);
+    diag({ ev: 'attempt', baseUrl: this.baseUrl, endpoint, model: this.model });
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
     try {
-      const resp = await fetch(this.baseUrl as string, {
+      const resp = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -182,7 +190,18 @@ export class OpenAICompatProvider implements LLMProvider {
         };
       }
 
-      const raw = (await resp.json()) as Record<string, unknown>;
+      let raw: Record<string, unknown>;
+      try {
+        raw = (await resp.json()) as Record<string, unknown>;
+      } catch {
+        diag({ ev: 'resp_not_json', status: resp.status });
+        return {
+          ok: false,
+          code: 'upstream_invalid_response',
+          message: '模型服务返回内容不是合法 JSON，请检查 LLM_BASE_URL 是否为兼容 OpenAI 的 base 地址。',
+          provider: this.name,
+        };
+      }
       const choices = raw.choices as Array<Record<string, unknown>> | undefined;
       const content = choices?.[0]?.message as Record<string, unknown> | undefined;
       const text = typeof content?.content === 'string' ? content.content : '';
