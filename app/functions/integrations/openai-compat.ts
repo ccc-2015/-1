@@ -35,6 +35,16 @@ function envInt(name: string, fallback: number): number {
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
+// 临时诊断日志（定位模型联调问题用，定位后删除）。
+// 仅记录配置状态与上游状态码/错误类型；绝不记录密钥值或合同原文。
+function diag(payload: Record<string, unknown>): void {
+  try {
+    console.error('[llm-diag] ' + JSON.stringify(payload));
+  } catch {
+    // noop
+  }
+}
+
 function buildUserPrompt(req: ExtractRequest): string {
   const scope = req.textScope === 'full_contract' ? '完整合同' : '合同片段';
   const candidates =
@@ -114,6 +124,14 @@ export class OpenAICompatProvider implements LLMProvider {
 
   async extractContract(req: ExtractRequest): Promise<ExtractResult> {
     if (!this.available) {
+      diag({
+        ev: 'unavailable',
+        hasKey: typeof this.apiKey === 'string' && this.apiKey.length > 0,
+        hasBaseUrl: !!this.baseUrl,
+        hasModel: !!this.model,
+        baseUrl: this.baseUrl ?? null,
+        model: this.model ?? null,
+      });
       return {
         ok: false,
         code: 'service_not_configured',
@@ -121,6 +139,8 @@ export class OpenAICompatProvider implements LLMProvider {
         provider: this.name,
       };
     }
+
+    diag({ ev: 'attempt', baseUrl: this.baseUrl, model: this.model });
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
@@ -145,6 +165,7 @@ export class OpenAICompatProvider implements LLMProvider {
       });
 
       if (!resp.ok) {
+        diag({ ev: 'http_error', status: resp.status });
         if (resp.status === 429) {
           return {
             ok: false,
@@ -169,6 +190,7 @@ export class OpenAICompatProvider implements LLMProvider {
       try {
         parsed = JSON.parse(text);
       } catch {
+        diag({ ev: 'bad_json', contentLen: text.length });
         return {
           ok: false,
           code: 'upstream_invalid_response',
@@ -177,6 +199,7 @@ export class OpenAICompatProvider implements LLMProvider {
         };
       }
       if (!isModelExtraction(parsed)) {
+        diag({ ev: 'bad_structure' });
         return {
           ok: false,
           code: 'upstream_invalid_response',
@@ -184,8 +207,10 @@ export class OpenAICompatProvider implements LLMProvider {
           provider: this.name,
         };
       }
+      diag({ ev: 'ok', model: this.model, findings: parsed.findings.length });
       return { ok: true, extraction: parsed, provider: this.name, model: this.model as string };
     } catch (err) {
+      diag({ ev: 'exception', name: (err as Error)?.name ?? 'unknown' });
       if ((err as Error)?.name === 'AbortError') {
         return {
           ok: false,
