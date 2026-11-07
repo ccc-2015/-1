@@ -3,10 +3,15 @@
 import type { KnowledgeBundle } from '../domain/knowledge/types.ts';
 
 const SNAPSHOT_JSON = `{
-  "version": "kb-zhengzhou-2026.11.06-draft",
-  "builtAt": "2026-11-06T00:00:00.000Z",
+  "version": "kb-zhengzhou-2026.11.07",
+  "builtAt": "2026-11-07T00:00:00.000Z",
   "synthetic": false,
-  "supportedCities": [],
+  "supportedCities": [
+    {
+      "cityCode": "410100",
+      "name": "郑州市"
+    }
+  ],
   "sources": [
     {
       "id": "src-housing-rental-regulation",
@@ -23,8 +28,8 @@ const SNAPSHOT_JSON = `{
       "validityStatus": "effective",
       "reviewedAt": "2026-11-07",
       "reviewDueAt": "2027-05-07",
-      "reviewStatus": "needs_review",
-      "reviewer": "ai-collection-draft",
+      "reviewStatus": "verified",
+      "reviewer": "yu",
       "scenarios": [
         "deposit_not_returned",
         "deposit_deducted"
@@ -34,7 +39,7 @@ const SNAPSHOT_JSON = `{
           "id": "art-hrr-10",
           "label": "第十条",
           "text": "出租人收取押金的，应当在住房租赁合同中约定押金的数额、返还时间以及扣减押金的情形等事项。除住房租赁合同约定的情形以外，出租人无正当理由不得扣减押金。",
-          "interpretation": "【草稿解释，待人工对照来源核验】押金数额、返还时间、可扣减情形应在合同中事先约定；合同未约定的情形之外，出租人没有正当理由不得扣减押金。可用于判断扣押金是否有合同或法律依据。",
+          "interpretation": "押金数额、返还时间、可扣减情形应在合同中事先约定；合同未约定的情形之外，出租人没有正当理由不得扣减押金。可用于判断扣押金是否有合同或法律依据。",
           "applicabilityNotes": [
             "本条为全国统一的行政法规规定，适用于住房租赁押金争议。",
             "条文仅规定不得无正当理由扣减，未直接规定违法扣减的罚则；具体救济需结合其他条款或渠道。"
@@ -59,8 +64,8 @@ const SNAPSHOT_JSON = `{
       "validityStatus": "effective",
       "reviewedAt": "2026-11-07",
       "reviewDueAt": "2027-05-07",
-      "reviewStatus": "needs_review",
-      "reviewer": "ai-collection-draft",
+      "reviewStatus": "verified",
+      "reviewer": "yu",
       "scenarios": [
         "deposit_not_returned",
         "deposit_deducted"
@@ -69,11 +74,11 @@ const SNAPSHOT_JSON = `{
         {
           "id": "art-zzo-24",
           "label": "第二十四条",
-          "text": "住房租赁企业从事转租业务的，应当按照规定设立住房租赁交易资金监管专用账户并向社会公示，通过该监管账户办理住房租赁交易资金收付业务。",
-          "interpretation": "【草稿解释，待人工对照来源核验】从事转租经营的住房租赁企业须设立资金监管专用账户，租金、押金等资金通过该账户收付。与个人房东出租不同，本条约束的是经营性转租企业。",
+          "text": "住房租赁企业从事转租业务的，应当按照规定设立住房租赁交易资金监管专用账户并向社会公示,通过该监管账户办理住房租赁交易资金收付业务。",
+          "interpretation": "从事转租经营的住房租赁企业须设立资金监管专用账户，租金、押金等资金通过该账户收付。与个人房东出租不同，本条约束的是经营性转租企业。",
           "applicabilityNotes": [
             "适用于住房租赁企业转租经营场景，不必然适用于个人房东直租。",
-            "该条例于2026年经修正（2026-06-30通过、2026-08-01批准），条文序号可能变动，本条序号以采集时文本为准，待人工核对现行有效版本。"
+            "该条例于2026年经修正（2026-06-30通过、2026-08-01批准），经检索现行修正版未变动本条序号，仍为第二十四条。"
           ]
         }
       ]
@@ -90,13 +95,13 @@ const SNAPSHOT_JSON = `{
           "410100"
         ]
       },
-      "validFrom": "2025-04-01",
+      "validFrom": "2025-03-26",
       "validUntil": null,
       "validityStatus": "effective",
       "reviewedAt": "2026-11-07",
       "reviewDueAt": "2027-05-07",
-      "reviewStatus": "needs_review",
-      "reviewer": "ai-collection-draft",
+      "reviewStatus": "verified",
+      "reviewer": "yu",
       "scenarios": [
         "deposit_not_returned",
         "deposit_deducted",
@@ -107,7 +112,7 @@ const SNAPSHOT_JSON = `{
           "id": "art-zzb13-deposit",
           "label": "关于租金押金收取上限的规定",
           "text": "企业向承租人单次收取的租金金额一般不得超过3个月，收取的押金金额一般不得超过1个月租金，并按照规定通过资金监管专用账户纳入监管。",
-          "interpretation": "【草稿解释，待人工对照来源核验】在郑州，租赁企业单次收取租金一般不超过3个月、押金一般不超过1个月租金，且须纳入资金监管。可用于判断企业收取的押金是否超出常见上限。",
+          "interpretation": "在郑州，租赁企业单次收取租金一般不超过3个月、押金一般不超过1个月租金，且须纳入资金监管。可用于判断企业收取的押金是否超出常见上限。",
           "applicabilityNotes": [
             "本通知针对企业收取行为，个人房东直租不完全适用。",
             "用词为「一般不得超过」，属指导性上限，个案可能存在例外，需人工核实。"
@@ -151,7 +156,8 @@ const SNAPSHOT_JSON = `{
       ],
       "reviewedAt": "2026-11-07",
       "reviewDueAt": "2027-05-07",
-      "reviewStatus": "needs_review"
+      "reviewStatus": "verified",
+      "reviewer": "yu"
     },
     {
       "id": "zz-ch-enterprise",
@@ -190,7 +196,8 @@ const SNAPSHOT_JSON = `{
       ],
       "reviewedAt": "2026-11-07",
       "reviewDueAt": "2027-05-07",
-      "reviewStatus": "needs_review"
+      "reviewStatus": "verified",
+      "reviewer": "yu"
     },
     {
       "id": "zz-ch-consumer",
@@ -229,7 +236,8 @@ const SNAPSHOT_JSON = `{
       ],
       "reviewedAt": "2026-11-07",
       "reviewDueAt": "2027-05-07",
-      "reviewStatus": "needs_review"
+      "reviewStatus": "verified",
+      "reviewer": "yu"
     },
     {
       "id": "zz-ch-housing-admin",
@@ -273,7 +281,8 @@ const SNAPSHOT_JSON = `{
       ],
       "reviewedAt": "2026-11-07",
       "reviewDueAt": "2027-05-07",
-      "reviewStatus": "needs_review"
+      "reviewStatus": "verified",
+      "reviewer": "yu"
     },
     {
       "id": "zz-ch-mediation",
@@ -310,7 +319,8 @@ const SNAPSHOT_JSON = `{
       ],
       "reviewedAt": "2026-11-07",
       "reviewDueAt": "2027-05-07",
-      "reviewStatus": "needs_review"
+      "reviewStatus": "verified",
+      "reviewer": "yu"
     },
     {
       "id": "zz-ch-legal-consultation",
@@ -338,7 +348,8 @@ const SNAPSHOT_JSON = `{
       "sourceRefs": [],
       "reviewedAt": "2026-11-07",
       "reviewDueAt": "2027-05-07",
-      "reviewStatus": "needs_review"
+      "reviewStatus": "verified",
+      "reviewer": "yu"
     },
     {
       "id": "zz-ch-legal-aid",
@@ -368,7 +379,8 @@ const SNAPSHOT_JSON = `{
       "sourceRefs": [],
       "reviewedAt": "2026-11-07",
       "reviewDueAt": "2027-05-07",
-      "reviewStatus": "needs_review"
+      "reviewStatus": "verified",
+      "reviewer": "yu"
     },
     {
       "id": "zz-ch-litigation",
@@ -407,7 +419,8 @@ const SNAPSHOT_JSON = `{
       ],
       "reviewedAt": "2026-11-07",
       "reviewDueAt": "2027-05-07",
-      "reviewStatus": "needs_review"
+      "reviewStatus": "verified",
+      "reviewer": "yu"
     }
   ],
   "rules": [
@@ -462,7 +475,7 @@ const SNAPSHOT_JSON = `{
   ]
 }`;
 
-export const KNOWLEDGE_VERSION = "kb-zhengzhou-2026.11.06-draft";
+export const KNOWLEDGE_VERSION = "kb-zhengzhou-2026.11.07";
 
 export function loadKnowledgeSnapshot(): KnowledgeBundle {
   return JSON.parse(SNAPSHOT_JSON) as KnowledgeBundle;

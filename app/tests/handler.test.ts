@@ -87,9 +87,9 @@ describe('handler routing & envelope (P1-09 edge checks)', () => {
     expect(body.meta.apiVersion).toBe('1');
     expect(body.meta.knowledgeVersion).toBe(KNOWLEDGE_VERSION);
     expect(headers.get('cache-control')).toBe('no-store');
-    // Draft state: nothing verified => no supported city, AI not configured.
+    // Verified state: 郑州 is supported; AI not configured in test env.
     expect(body.data.knowledgeVersion).toBe(bundle.version);
-    expect(body.data.supportedCities).toEqual([]);
+    expect(body.data.supportedCities).toEqual([{ cityCode: '410100', name: '郑州市' }]);
     expect(body.data.features.liveAi).toBe(false);
     expect(body.data.features.documentExtraction).toBe(false);
     expect(body.data.features.materialExport).toBe(false);
@@ -101,12 +101,19 @@ describe('handler routing & envelope (P1-09 edge checks)', () => {
     expect(res.headers.get('allow')).toBe('GET');
   });
 
-  it('sources GET -> 200, only verified sources (none yet)', async () => {
-    const { status, body } = await callJson<Success<{ sources: unknown[] }>>(
+  it('sources GET -> 200, only verified public sources, no review fields leaked', async () => {
+    const { status, body } = await callJson<Success<{ sources: Record<string, unknown>[] }>>(
       makeRequest('sources'),
     );
     expect(status).toBe(200);
-    expect(body.data.sources).toEqual([]);
+    expect(body.data.sources).toHaveLength(3);
+    for (const s of body.data.sources) {
+      expect(typeof s.officialUrl).toBe('string');
+      expect((s.officialUrl as string).startsWith('http')).toBe(true);
+      expect(s).not.toHaveProperty('reviewStatus');
+      expect(s).not.toHaveProperty('reviewer');
+      expect(Array.isArray(s.articles)).toBe(true);
+    }
     expect(body.meta.knowledgeVersion).toBe(bundle.version);
   });
 
@@ -207,7 +214,7 @@ describe('handler routing & envelope (P1-09 edge checks)', () => {
     expect(body.error.code).toBe('invalid_input');
   });
 
-  it('diagnose-dispute unverified city -> 200 coverage=unsupported, no local steps/refs', async () => {
+  it('diagnose-dispute supported city -> 200 coverage=supported with local steps/refs', async () => {
     const { status, body } = await callJson<Success<DisputePlan>>(
       makeRequest('diagnose-dispute', {
         method: 'POST',
@@ -216,13 +223,12 @@ describe('handler routing & envelope (P1-09 edge checks)', () => {
     );
     expect(status).toBe(200);
     expect(body.ok).toBe(true);
-    expect(body.meta.coverage).toBe('unsupported');
+    expect(body.meta.coverage).toBe('supported');
     expect(body.meta.processingMode).toBe('rules');
     expect(body.meta.knowledgeVersion).toBe(bundle.version);
-    expect(body.data.nextSteps).toEqual([]);
-    expect(body.data.references).toEqual([]);
-    expect(body.meta.warnings.some((w) => w.includes('尚未完成资料核验'))).toBe(true);
-    // General evidence checklist is still provided (right to evidence not denied).
+    expect(body.data.nextSteps.length).toBeGreaterThan(0);
+    expect(body.data.references.length).toBeGreaterThan(0);
+    expect(body.meta.warnings.some((w) => w.includes('尚未完成资料核验'))).toBe(false);
     expect(body.data.evidenceChecklist.length).toBeGreaterThan(0);
   });
 
@@ -237,7 +243,7 @@ describe('handler routing & envelope (P1-09 edge checks)', () => {
     expect(body.meta.coverage).toBe('unsupported');
   });
 
-  it('analyze-contract with mock provider -> 200 rules_and_ai, still unsupported coverage', async () => {
+  it('analyze-contract with mock provider -> 200 rules_and_ai, supported coverage', async () => {
     (globalThis as { Deno?: unknown }).Deno = {
       env: { get: (k: string) => (k === 'LLM_USE_MOCK' ? '1' : undefined) },
     };
@@ -254,10 +260,10 @@ describe('handler routing & envelope (P1-09 edge checks)', () => {
     );
     expect(status).toBe(200);
     expect(body.meta.processingMode).toBe('rules_and_ai');
-    expect(body.meta.coverage).toBe('unsupported');
+    expect(body.meta.coverage).toBe('supported');
     expect(Array.isArray(body.data.findings)).toBe(true);
-    expect(body.data.references).toEqual([]);
-    expect(body.meta.warnings.some((w) => w.includes('尚未完成资料核验'))).toBe(true);
+    expect(Array.isArray(body.data.references)).toBe(true);
+    expect(body.meta.warnings.some((w) => w.includes('尚未完成资料核验'))).toBe(false);
   });
 
   it('analyze-contract without provider -> 200 rules-only, degraded warning', async () => {

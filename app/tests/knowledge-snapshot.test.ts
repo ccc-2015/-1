@@ -134,15 +134,16 @@ describe('knowledge snapshot integrity (P1-05)', () => {
     expect(cfg.features.materialExport).toBe(false);
   });
 
-  it('draft state is honest: nothing verified => no supported city, scenario or source', () => {
+  it('verified state is honest: supported city is backed by verified+current records', () => {
     const anyVerified =
-      bundle.sources.some(isVerifiedCurrent) || bundle.channels.some(isVerifiedCurrent);
-    if (!anyVerified) {
-      expect(bundle.supportedCities).toEqual([]);
-      expect(deriveSupportedScenarios(bundle)).toEqual([]);
-      expect(listVerifiedSources(bundle)).toEqual([]);
-      expect(isCitySupported(bundle, '410100')).toBe(false);
-      expect(buildPublicConfig(bundle, false).supportedCities).toEqual([]);
-    }
+      bundle.sources.some((r) => isVerifiedCurrent(r)) ||
+      bundle.channels.some((r) => isVerifiedCurrent(r));
+    expect(anyVerified).toBe(true);
+    expect(bundle.supportedCities).toEqual([{ cityCode: '410100', name: '郑州市' }]);
+    expect(isCitySupported(bundle, '410100')).toBe(true);
+    expect(listVerifiedSources(bundle)).toHaveLength(3);
+    expect(buildPublicConfig(bundle, false).supportedCities).toEqual([
+      { cityCode: '410100', name: '郑州市' },
+    ]);
   });
 });

@@ -30,8 +30,8 @@ function baseInput(overrides: Partial<DisputeInput> = {}): DisputeInput {
 }
 
 describe('diagnoseDispute - 未支持城市降级', () => {
-  it('生产快照城市未核验时返回 unsupported 且无当地渠道', () => {
-    const result = diagnoseDispute(baseInput({ cityCode: '410100' }), loadKnowledgeSnapshot());
+  it('非覆盖城市返回 unsupported 且无当地渠道', () => {
+    const result = diagnoseDispute(baseInput({ cityCode: '999999' }), loadKnowledgeSnapshot());
     expect(result.coverage).toBe('unsupported');
     expect(result.plan.nextSteps).toHaveLength(0);
     expect(result.plan.conditionalOptions).toHaveLength(0);
@@ -41,7 +41,7 @@ describe('diagnoseDispute - 未支持城市降级', () => {
   });
 
   it('unsupported 时仍生成事实摘要与协商模板', () => {
-    const result = diagnoseDispute(baseInput({ cityCode: '410100' }), loadKnowledgeSnapshot());
+    const result = diagnoseDispute(baseInput({ cityCode: '999999' }), loadKnowledgeSnapshot());
     expect(result.plan.factsSummary.length).toBeGreaterThan(0);
     expect(result.plan.communication.text.length).toBeGreaterThan(0);
   });

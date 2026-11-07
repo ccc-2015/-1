@@ -8,7 +8,7 @@
 - 采集阶段所有记录一律 `reviewStatus = "needs_review"`，`reviewer = "ai-collection-draft"`。
 - **未核验的电话/网址一律留 `null`**（§2.2「没有核验时显示『尚未核实』，不让模型补全」）。
 - 只写入实际抓取确认的原文；未在开发文档或凭记忆猜测 URL / 法条。
-- `supportedCities` 由构建脚本从 `verified` 且未过期的记录派生；当前为空，故应用对郑州如实返回 `coverage = unsupported`（§2.5「不因创建配置项即显示为已支持」）。
+- `supportedCities` 由构建脚本从 `verified` 且未过期的记录派生。**2026-11-07 经人工复核（复核人 yu）后，郑州 3 条来源 + 8 条渠道已置为 `verified`，`supportedCities` 派生出 `410100/郑州市`，应用对郑州如实返回 `coverage = supported`。**
 
 ---
 
@@ -16,9 +16,9 @@
 
 | source id | 名称 | 层级 | 施行 | officialUrl | URL 抓取核验 | 原文核验 | 状态 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| src-housing-rental-regulation | 住房租赁条例（国务院令第812号） | 全国 | 2025-09-15 | https://www.gov.cn/gongbao/2025/issue_12186/202507/content_7034094.html | 已核验可访问 | 第十条经 6+ 独立来源逐字互证 | needs_review |
-| src-zhengzhou-rental-ordinance | 郑州市住房租赁管理条例 | 地方(410100) | 2025-01-01（2026 修正） | https://www.zzrd.gov.cn/law/print.aspx?nid=122 | 已核验 | 第二十四条、备案条逐字；**序号存疑** | needs_review |
-| src-zhengzhengban-2025-13 | 郑政办〔2025〕13号 通知 | 地方(410100) | 2025-04-01 | https://public.zhengzhou.gov.cn/D0102X/9191560.jhtml | 已核验 | 押金/租金上限句逐字 | needs_review |
+| src-housing-rental-regulation | 住房租赁条例（国务院令第812号） | 全国 | 2025-09-15 | https://www.gov.cn/gongbao/2025/issue_12186/202507/content_7034094.html | 已核验可访问 | 第十条经 6+ 独立来源逐字互证 | **verified（yu, 2026-11-07）** |
+| src-zhengzhou-rental-ordinance | 郑州市住房租赁管理条例 | 地方(410100) | 2025-01-01（2026 修正，序号未变） | https://www.zzrd.gov.cn/law/print.aspx?nid=122 | 已核验 | 第二十四条逐字（半角逗号）；序号已确认未变 | **verified（yu, 2026-11-07）** |
+| src-zhengzhengban-2025-13 | 郑政办〔2025〕13号 通知 | 地方(410100) | 2025-03-26（公布即施行，已修正） | https://public.zhengzhou.gov.cn/D0102X/9191560.jhtml | 已核验 | 押金/租金上限句逐字 | **verified（yu, 2026-11-07）** |
 
 采集要点：
 - **住房租赁条例第十条**（逐字）：「出租人收取押金的，应当在住房租赁合同中约定押金的数额、返还时间以及扣减押金的情形等事项。除住房租赁合同约定的情形以外，出租人无正当理由不得扣减押金。」
@@ -77,4 +77,21 @@
 - 命令：`npm run build:knowledge`（`scripts/build-knowledge.mjs`）。
 - 校验项：字段类型、来源/条文引用闭合、证据 id 闭合、地域一致性、`supportedCities` 派生。
 - 产物：`app/functions/data/knowledge-snapshot.ts`（生成文件，勿手改；`synthetic = false`）。
-- 最近一次构建：sources=3 / channels=8 / rules=3，verified=0，supportedCities=[]（草稿态，符合预期）。
+- 最近一次构建（2026-11-07，人工复核后）：sources=3 / channels=8 / rules=3，verified=3+8，supportedCities=[{410100,郑州市}]，version=kb-zhengzhou-2026.11.07。
+
+## 7. 人工复核记录（2026-11-07，复核人 yu）
+
+采用「API 检索交叉核对 + 人工确认」的混合流程：由 agent 检索官方原文与链接，逐条比对 JSON `text`，人工（yu）确认后一键置 `verified`（`scripts/verify-knowledge.mjs`）。检索证据见 `VERIFICATION_WORKSHEET.md`。
+
+复核决策与据此所做的修正：
+1. **复核人**：yu；`reviewedAt=2026-11-07`，`reviewDueAt=2027-05-07`（180 天复审）。
+2. **逗号规范**：全部使用半角逗号。据此把 `art-zzo-24` 原文中「公示，通过」的全角逗号改为半角「公示,通过」，与官方文本逐字一致。
+3. **郑政办〔2025〕13号 施行日期修正**：JSON 原记 `validFrom=2025-04-01`，但定向检索官方通知落款明确为「本通知自公布之日起执行。郑州市人民政府办公室 2025年3月26日」。**据事实修正为 `validFrom=2025-03-26`。**
+   - 说明：这与「按日期取最新」的并列规则不同——此处是同一份文件内部「公布即施行」的事实认定，官方落款日期为权威依据，故以检索到的准确日期为准，而非在多个候选版本间择新。
+4. **郑州条例 2026 修正序号**：检索现行修正版确认**未变动**第二十四条序号，`applicabilityNotes` 中「序号可能变动」的存疑标注已改为「经检索现行修正版未变动本条序号」。
+5. **草稿解释标记清理**：三条 `interpretation` 去掉「【草稿解释，待人工对照来源核验】」前缀，因已逐条对照官方原文核验。
+6. **渠道联系方式仍留 `null`**：本次复核聚焦来源原文与结构；各渠道官方电话/网址（12315、12348 等）**未逐项核验，保持 `null`（显示「尚未核实」）**，待后续单独核验后补录，避免写入未核实热线。
+
+复核范围：3 条来源（住房租赁条例第十条、郑州条例第二十四条、郑政办13号押金上限条）+ 8 条郑州渠道，全部置 `verified`。
+
+> §2.3.5 独立第二人复核：本次由 yu 完成人工确认；单人团队仍建议在正式发布/对外前安排独立第二人留痕复核，尤其渠道受理范围与联系方式。

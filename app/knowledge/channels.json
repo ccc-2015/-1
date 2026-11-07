@@ -7,15 +7,34 @@
     "receiver": "出租方（房东或租赁企业）",
     "officialUrl": null,
     "phone": null,
-    "acceptedScenarios": ["deposit_not_returned", "deposit_deducted"],
-    "counterpartyTypes": ["individual_landlord", "agency", "operator", "unknown"],
+    "acceptedScenarios": [
+      "deposit_not_returned",
+      "deposit_deducted"
+    ],
+    "counterpartyTypes": [
+      "individual_landlord",
+      "agency",
+      "operator",
+      "unknown"
+    ],
     "eligibilityConditions": [],
     "exclusions": [],
-    "requiredEvidenceIds": ["lease_contract", "deposit_payment"],
-    "sourceRefs": [{ "sourceId": "src-housing-rental-regulation", "articleIds": ["art-hrr-10"] }],
+    "requiredEvidenceIds": [
+      "lease_contract",
+      "deposit_payment"
+    ],
+    "sourceRefs": [
+      {
+        "sourceId": "src-housing-rental-regulation",
+        "articleIds": [
+          "art-hrr-10"
+        ]
+      }
+    ],
     "reviewedAt": "2026-11-07",
     "reviewDueAt": "2027-05-07",
-    "reviewStatus": "needs_review"
+    "reviewStatus": "verified",
+    "reviewer": "yu"
   },
   {
     "id": "zz-ch-enterprise",
@@ -25,15 +44,37 @@
     "receiver": "住房租赁企业或平台客服",
     "officialUrl": null,
     "phone": null,
-    "acceptedScenarios": ["deposit_not_returned", "deposit_deducted"],
-    "counterpartyTypes": ["agency", "operator"],
-    "eligibilityConditions": ["对方为经营性住房租赁企业或平台"],
-    "exclusions": ["对方为个人房东时通常不适用"],
-    "requiredEvidenceIds": ["lease_contract", "deposit_payment", "communications"],
-    "sourceRefs": [{ "sourceId": "src-zhengzhou-rental-ordinance", "articleIds": ["art-zzo-24"] }],
+    "acceptedScenarios": [
+      "deposit_not_returned",
+      "deposit_deducted"
+    ],
+    "counterpartyTypes": [
+      "agency",
+      "operator"
+    ],
+    "eligibilityConditions": [
+      "对方为经营性住房租赁企业或平台"
+    ],
+    "exclusions": [
+      "对方为个人房东时通常不适用"
+    ],
+    "requiredEvidenceIds": [
+      "lease_contract",
+      "deposit_payment",
+      "communications"
+    ],
+    "sourceRefs": [
+      {
+        "sourceId": "src-zhengzhou-rental-ordinance",
+        "articleIds": [
+          "art-zzo-24"
+        ]
+      }
+    ],
     "reviewedAt": "2026-11-07",
     "reviewDueAt": "2027-05-07",
-    "reviewStatus": "needs_review"
+    "reviewStatus": "verified",
+    "reviewer": "yu"
   },
   {
     "id": "zz-ch-consumer",
@@ -43,15 +84,37 @@
     "receiver": "市场监督管理部门/消费者权益保护机构",
     "officialUrl": null,
     "phone": null,
-    "acceptedScenarios": ["deposit_not_returned", "deposit_deducted", "extra_fee"],
-    "counterpartyTypes": ["agency", "operator"],
-    "eligibilityConditions": ["存在消费经营关系（对方为经营者）"],
-    "exclusions": ["个人之间偶发租赁，非经营行为时受理范围待核实"],
-    "requiredEvidenceIds": ["lease_contract", "deposit_payment"],
-    "sourceRefs": [{ "sourceId": "src-zhengzhengban-2025-13", "articleIds": ["art-zzb13-deposit"] }],
+    "acceptedScenarios": [
+      "deposit_not_returned",
+      "deposit_deducted",
+      "extra_fee"
+    ],
+    "counterpartyTypes": [
+      "agency",
+      "operator"
+    ],
+    "eligibilityConditions": [
+      "存在消费经营关系（对方为经营者）"
+    ],
+    "exclusions": [
+      "个人之间偶发租赁，非经营行为时受理范围待核实"
+    ],
+    "requiredEvidenceIds": [
+      "lease_contract",
+      "deposit_payment"
+    ],
+    "sourceRefs": [
+      {
+        "sourceId": "src-zhengzhengban-2025-13",
+        "articleIds": [
+          "art-zzb13-deposit"
+        ]
+      }
+    ],
     "reviewedAt": "2026-11-07",
     "reviewDueAt": "2027-05-07",
-    "reviewStatus": "needs_review"
+    "reviewStatus": "verified",
+    "reviewer": "yu"
   },
   {
     "id": "zz-ch-housing-admin",
@@ -61,18 +124,42 @@
     "receiver": "郑州市住房保障和房地产管理部门",
     "officialUrl": null,
     "phone": null,
-    "acceptedScenarios": ["deposit_not_returned", "deposit_deducted"],
-    "counterpartyTypes": ["agency", "operator"],
-    "eligibilityConditions": ["涉及住房租赁企业经营行为或资金监管事项"],
-    "exclusions": ["个人房东直租的行业监管受理范围待核实"],
-    "requiredEvidenceIds": ["lease_contract", "deposit_payment"],
+    "acceptedScenarios": [
+      "deposit_not_returned",
+      "deposit_deducted"
+    ],
+    "counterpartyTypes": [
+      "agency",
+      "operator"
+    ],
+    "eligibilityConditions": [
+      "涉及住房租赁企业经营行为或资金监管事项"
+    ],
+    "exclusions": [
+      "个人房东直租的行业监管受理范围待核实"
+    ],
+    "requiredEvidenceIds": [
+      "lease_contract",
+      "deposit_payment"
+    ],
     "sourceRefs": [
-      { "sourceId": "src-zhengzhou-rental-ordinance", "articleIds": ["art-zzo-24"] },
-      { "sourceId": "src-zhengzhengban-2025-13", "articleIds": ["art-zzb13-deposit"] }
+      {
+        "sourceId": "src-zhengzhou-rental-ordinance",
+        "articleIds": [
+          "art-zzo-24"
+        ]
+      },
+      {
+        "sourceId": "src-zhengzhengban-2025-13",
+        "articleIds": [
+          "art-zzb13-deposit"
+        ]
+      }
     ],
     "reviewedAt": "2026-11-07",
     "reviewDueAt": "2027-05-07",
-    "reviewStatus": "needs_review"
+    "reviewStatus": "verified",
+    "reviewer": "yu"
   },
   {
     "id": "zz-ch-mediation",
@@ -82,15 +169,35 @@
     "receiver": "人民调解组织",
     "officialUrl": null,
     "phone": null,
-    "acceptedScenarios": ["deposit_not_returned", "deposit_deducted"],
-    "counterpartyTypes": ["individual_landlord", "agency", "operator", "unknown"],
-    "eligibilityConditions": ["需双方同意调解"],
+    "acceptedScenarios": [
+      "deposit_not_returned",
+      "deposit_deducted"
+    ],
+    "counterpartyTypes": [
+      "individual_landlord",
+      "agency",
+      "operator",
+      "unknown"
+    ],
+    "eligibilityConditions": [
+      "需双方同意调解"
+    ],
     "exclusions": [],
-    "requiredEvidenceIds": ["lease_contract"],
-    "sourceRefs": [{ "sourceId": "src-housing-rental-regulation", "articleIds": ["art-hrr-10"] }],
+    "requiredEvidenceIds": [
+      "lease_contract"
+    ],
+    "sourceRefs": [
+      {
+        "sourceId": "src-housing-rental-regulation",
+        "articleIds": [
+          "art-hrr-10"
+        ]
+      }
+    ],
     "reviewedAt": "2026-11-07",
     "reviewDueAt": "2027-05-07",
-    "reviewStatus": "needs_review"
+    "reviewStatus": "verified",
+    "reviewer": "yu"
   },
   {
     "id": "zz-ch-legal-consultation",
@@ -100,15 +207,26 @@
     "receiver": "公共法律服务中心/法律咨询渠道",
     "officialUrl": null,
     "phone": null,
-    "acceptedScenarios": ["deposit_not_returned", "deposit_deducted"],
-    "counterpartyTypes": ["individual_landlord", "agency", "operator", "unknown"],
-    "eligibilityConditions": ["用于咨询，不构成代理或结果承诺"],
+    "acceptedScenarios": [
+      "deposit_not_returned",
+      "deposit_deducted"
+    ],
+    "counterpartyTypes": [
+      "individual_landlord",
+      "agency",
+      "operator",
+      "unknown"
+    ],
+    "eligibilityConditions": [
+      "用于咨询，不构成代理或结果承诺"
+    ],
     "exclusions": [],
     "requiredEvidenceIds": [],
     "sourceRefs": [],
     "reviewedAt": "2026-11-07",
     "reviewDueAt": "2027-05-07",
-    "reviewStatus": "needs_review"
+    "reviewStatus": "verified",
+    "reviewer": "yu"
   },
   {
     "id": "zz-ch-legal-aid",
@@ -118,15 +236,28 @@
     "receiver": "法律援助机构",
     "officialUrl": null,
     "phone": null,
-    "acceptedScenarios": ["deposit_not_returned", "deposit_deducted"],
-    "counterpartyTypes": ["individual_landlord", "agency", "operator", "unknown"],
-    "eligibilityConditions": ["需符合经济困难等法律援助受理条件，具体资格须单独核实"],
-    "exclusions": ["不符合受理条件时不提供免费代理"],
+    "acceptedScenarios": [
+      "deposit_not_returned",
+      "deposit_deducted"
+    ],
+    "counterpartyTypes": [
+      "individual_landlord",
+      "agency",
+      "operator",
+      "unknown"
+    ],
+    "eligibilityConditions": [
+      "需符合经济困难等法律援助受理条件，具体资格须单独核实"
+    ],
+    "exclusions": [
+      "不符合受理条件时不提供免费代理"
+    ],
     "requiredEvidenceIds": [],
     "sourceRefs": [],
     "reviewedAt": "2026-11-07",
     "reviewDueAt": "2027-05-07",
-    "reviewStatus": "needs_review"
+    "reviewStatus": "verified",
+    "reviewer": "yu"
   },
   {
     "id": "zz-ch-litigation",
@@ -136,14 +267,36 @@
     "receiver": "人民法院",
     "officialUrl": null,
     "phone": null,
-    "acceptedScenarios": ["deposit_not_returned", "deposit_deducted"],
-    "counterpartyTypes": ["individual_landlord", "agency", "operator", "unknown"],
-    "eligibilityConditions": ["协商、调解等未能解决时可考虑诉讼；需评估成本与证据"],
+    "acceptedScenarios": [
+      "deposit_not_returned",
+      "deposit_deducted"
+    ],
+    "counterpartyTypes": [
+      "individual_landlord",
+      "agency",
+      "operator",
+      "unknown"
+    ],
+    "eligibilityConditions": [
+      "协商、调解等未能解决时可考虑诉讼；需评估成本与证据"
+    ],
     "exclusions": [],
-    "requiredEvidenceIds": ["lease_contract", "deposit_payment", "checkout_handover"],
-    "sourceRefs": [{ "sourceId": "src-housing-rental-regulation", "articleIds": ["art-hrr-10"] }],
+    "requiredEvidenceIds": [
+      "lease_contract",
+      "deposit_payment",
+      "checkout_handover"
+    ],
+    "sourceRefs": [
+      {
+        "sourceId": "src-housing-rental-regulation",
+        "articleIds": [
+          "art-hrr-10"
+        ]
+      }
+    ],
     "reviewedAt": "2026-11-07",
     "reviewDueAt": "2027-05-07",
-    "reviewStatus": "needs_review"
+    "reviewStatus": "verified",
+    "reviewer": "yu"
   }
 ]
