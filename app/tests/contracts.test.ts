@@ -274,10 +274,10 @@ describe('analyzeContract: 编排与降级', () => {
 
   it('模型请求失败时降级为 rules，不伪造成功', async () => {
     const failing: LLMProvider = {
-      name: 'dashscope',
+      name: 'openai-compat',
       available: true,
       async extractContract(): Promise<ExtractResult> {
-        return { ok: false, code: 'upstream_timeout', message: 'timeout', provider: 'dashscope' };
+        return { ok: false, code: 'upstream_timeout', message: 'timeout', provider: 'openai-compat' };
       },
     };
     const res = await analyzeContract(input('押金2000元。'), syntheticBundle(), failing);

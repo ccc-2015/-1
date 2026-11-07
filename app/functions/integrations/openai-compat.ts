@@ -5,11 +5,10 @@ import type {
   ModelExtraction,
 } from './llm.ts';
 
-const DASHSCOPE_ENDPOINT =
-  'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions';
-const MODEL = 'qwen-plus';
-const TIMEOUT_MS = 25000;
-const MAX_OUTPUT_TOKENS = 2000;
+// 端点、模型、密钥全部来自环境变量（Secret），代码不写死任何厂商。
+// 约定使用 OpenAI 兼容的 /chat/completions 接口格式。
+const DEFAULT_TIMEOUT_MS = 25000;
+const DEFAULT_MAX_OUTPUT_TOKENS = 2000;
 
 const SYSTEM_PROMPT = [
   '你是租房合同押金条款的信息提取助手。',
@@ -24,6 +23,17 @@ const SYSTEM_PROMPT = [
   'category 取值：deposit_amount | deposit_return | deposit_deduction | deposit_forfeit。',
   'checkStatus 取值：clear | ambiguous | not_found | needs_verification。',
 ].join('\n');
+
+function env(name: string): string | undefined {
+  return typeof Deno !== 'undefined' ? Deno.env.get(name) : undefined;
+}
+
+function envInt(name: string, fallback: number): number {
+  const raw = env(name);
+  if (raw === undefined || raw.trim() === '') return fallback;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
 
 function buildUserPrompt(req: ExtractRequest): string {
   const scope = req.textScope === 'full_contract' ? '完整合同' : '合同片段';
@@ -66,16 +76,40 @@ function isModelExtraction(value: unknown): value is ModelExtraction {
   });
 }
 
-export class DashScopeProvider implements LLMProvider {
-  readonly name = 'dashscope';
-  private apiKey: string | undefined;
+export type ProviderConfig = {
+  apiKey?: string;
+  baseUrl?: string;
+  model?: string;
+  timeoutMs?: number;
+  maxOutputTokens?: number;
+};
 
-  constructor(apiKey?: string) {
-    this.apiKey = apiKey ?? (typeof Deno !== 'undefined' ? Deno.env.get('LLM_API_KEY') : undefined);
+export class OpenAICompatProvider implements LLMProvider {
+  readonly name = 'openai-compat';
+  private apiKey: string | undefined;
+  private baseUrl: string | undefined;
+  private model: string | undefined;
+  private timeoutMs: number;
+  private maxOutputTokens: number;
+
+  constructor(cfg: ProviderConfig = {}) {
+    this.apiKey = cfg.apiKey ?? env('LLM_API_KEY');
+    this.baseUrl = (cfg.baseUrl ?? env('LLM_BASE_URL'))?.trim() || undefined;
+    this.model = (cfg.model ?? env('LLM_MODEL'))?.trim() || undefined;
+    this.timeoutMs = cfg.timeoutMs ?? envInt('LLM_TIMEOUT_MS', DEFAULT_TIMEOUT_MS);
+    this.maxOutputTokens =
+      cfg.maxOutputTokens ?? envInt('LLM_MAX_OUTPUT_TOKENS', DEFAULT_MAX_OUTPUT_TOKENS);
   }
 
   get available(): boolean {
-    return typeof this.apiKey === 'string' && this.apiKey.length > 0;
+    return (
+      typeof this.apiKey === 'string' &&
+      this.apiKey.length > 0 &&
+      typeof this.baseUrl === 'string' &&
+      /^https?:\/\//.test(this.baseUrl) &&
+      typeof this.model === 'string' &&
+      this.model.length > 0
+    );
   }
 
   async extractContract(req: ExtractRequest): Promise<ExtractResult> {
@@ -83,24 +117,24 @@ export class DashScopeProvider implements LLMProvider {
       return {
         ok: false,
         code: 'service_not_configured',
-        message: 'LLM_API_KEY 未配置，无法调用模型。',
+        message: 'LLM 未完整配置（需 LLM_BASE_URL、LLM_MODEL、LLM_API_KEY），无法调用模型。',
         provider: this.name,
       };
     }
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
     try {
-      const resp = await fetch(DASHSCOPE_ENDPOINT, {
+      const resp = await fetch(this.baseUrl as string, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify({
-          model: MODEL,
+          model: this.model,
           temperature: 0,
-          max_tokens: MAX_OUTPUT_TOKENS,
+          max_tokens: this.maxOutputTokens,
           response_format: { type: 'json_object' },
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
@@ -150,7 +184,7 @@ export class DashScopeProvider implements LLMProvider {
           provider: this.name,
         };
       }
-      return { ok: true, extraction: parsed, provider: this.name, model: MODEL };
+      return { ok: true, extraction: parsed, provider: this.name, model: this.model as string };
     } catch (err) {
       if ((err as Error)?.name === 'AbortError') {
         return {
