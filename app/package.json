@@ -15,6 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build:knowledge": "node scripts/build-knowledge.mjs",
+    "verify:knowledge": "node scripts/verify-knowledge.mjs",
     "check:function:types": "tsc -p tsconfig.functions.json",
     "dev:function": "deno run --allow-net=127.0.0.1:8000 dev/function-local.ts",
     "check:function": "deno check functions/index.ts"
